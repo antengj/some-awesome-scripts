@@ -2,8 +2,7 @@
 # Renew:  ./certbot-auto renew --manual-auth-hook /path/to/certbot-auth-dnspod.sh
 #!/bin/bash
 
-API_TOKEN="xxx,xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-
+API_TOKEN="$DNSPOD_API_TOKEN"
 USER_AGENT="AnDNS/1.0.0"
 DOMAIN=$(expr match "$CERTBOT_DOMAIN" '.*\.\(.*\..*\)')
 TXHOST=$(expr match "$CERTBOT_DOMAIN" '\(.*\)\..*\..*')
@@ -12,23 +11,9 @@ TXHOST=$(expr match "$CERTBOT_DOMAIN" '\(.*\)\..*\..*')
 [ -z "$TXHOST" ] && TXHOST="_acme-challenge"
 
 if [ -z "$API_TOKEN" ]; then
-    [ -f $HOME/.dnspod_token_$DOMAIN ] && API_TOKEN=$(cat $HOME/.dnspod_token_$DOMAIN)
-fi
-
-if [ -z "$API_TOKEN" ]; then
-    [ -f /etc/dnspod_token_$DOMAIN ] && API_TOKEN=$(cat /etc/dnspod_token_$DOMAIN)
-fi
-
-if [ -z "$API_TOKEN" ]; then
-    [ -f $HOME/.dnspod_token ] && API_TOKEN=$(cat $HOME/.dnspod_token)
-fi
-
-if [ -z "$API_TOKEN" ]; then
-    [ -f /etc/dnspod_token ] && API_TOKEN=$(cat /etc/dnspod_token)
-fi
-
-if [ -z "$API_TOKEN" ]; then
-    API_TOKEN="$DNSPOD_TOKEN"
+echo "\
+Exit:        Miss dnspod api token"
+    exit
 fi
 
 PARAMS="login_token=$API_TOKEN&format=json"
